@@ -4,13 +4,6 @@ public class Point {
     private int x = 0;
     private int y = 0;
 
-    Point moveCoordsBydXdY(int x, int y){
-        this.x += x;
-        this.y += y;
-
-        return this;
-    }
-
     public Point() {
     }
 
@@ -19,7 +12,19 @@ public class Point {
         y = p.y;
     }
 
-    Point getCoordinates(){
+    public Point(int x, int y) {
+        this.y = y;
+        this.x = x;
+    }
+
+    public Point moveCoordsBydXdY(int x, int y) {
+        this.x += x;
+        this.y += y;
+
+        return this;
+    }
+
+    Point getCoordinates() {
         return new Point(this);
     }
 
@@ -27,12 +32,12 @@ public class Point {
         return x;
     }
 
-    public int getY() {
-        return y;
-    }
-
     public void setX(int x) {
         this.x = x;
+    }
+
+    public int getY() {
+        return y;
     }
 
     public void setY(int y) {
@@ -45,5 +50,21 @@ public class Point {
                 "x=" + x +
                 ", y=" + y +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;  // type check
+
+        if (obj == null)
+            return false;
+
+
+        if (!(getClass() == obj.getClass()))
+            return false;
+
+        Point tmp = (Point) obj;
+        return tmp.getX() == this.getX() && tmp.getY() == this.getY();
     }
 }
