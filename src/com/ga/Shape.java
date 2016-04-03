@@ -1,5 +1,6 @@
 package com.ga;
 
+import com.ga.impl.GA;
 import org.ejml.simple.SimpleMatrix;
 
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ public class Shape {
     int angle;
     Type type;
     List<Point> vertices = new ArrayList<>();
+
     public Shape(Point center, int angle, Type type) {
         this.center = center;
         this.angle = angle;
@@ -35,15 +37,26 @@ public class Shape {
 
     public static void main(String[] args) {
 
-        Field f = new Field();
 
+        GA f = new GA();
+//        f.generateSpecies();
+        System.out.println(f.generateSpecies().field.toString());
+        System.out.println(f.generateSpecies().field.getFreeRows());
+        f.setVisible(true);
 
-        f.placeShape(new Shape(new Point(7, 5), -180, Shape.Type.TRIANGLE));
-        f.placeShape(new Shape(new Point(16, 10), 90, Shape.Type.TRIANGLE));
+//        System.out.println(f.shapes.size());
+//        System.out.println(f.shapes);
 
-        System.out.println(f.toString());
-
-
+//        Field f = new Field(20);
+//
+//        f.placeShape(new Shape(new Point(5, 5), 0, Type.TRIANGLE));
+//        f.placeShape(new Shape(new Point(9, 5), 0, Type.TRIANGLE));
+//        f.placeShape(new Shape(new Point(9, 15), 0, Type.TRIANGLE));
+//        f.placeShape(new Shape(new Point(9, 10), 0, Type.TRIANGLE));
+//        f.placeShape(new Shape(new Point(9, 2), 0, Type.TRIANGLE));
+//
+//        System.out.println(f.toString());
+//        System.out.println(f.getFreeRows());
     }
 
     private void newLShape(Point center) {
@@ -56,43 +69,41 @@ public class Shape {
     }
 
     private void newTriangle(Point center) {
-        Point p = null, p1, p2;
+        Point p3 = null, p1, p2;
 
-        p1 = p2 = p;
+        p1 = p2 = p3;
 
-//        vertices.add(center.getCoordinates().moveCoordsBydXdY(-SIZE, -SIZE));
-//        vertices.add(center.getCoordinates().moveCoordsBydXdY(-SIZE, SIZE));
-//        vertices.add(center.getCoordinates().moveCoordsBydXdY(SIZE, -SIZE));
+        p1 = new Point(center.getCoordinates().moveCoordsBydXdY(-SIZE, SIZE));
+        p2 = new Point(center.getCoordinates().moveCoordsBydXdY(-SIZE, -SIZE));
+        p3 = new Point(center.getCoordinates().moveCoordsBydXdY(SIZE, -SIZE));
 
-        p = center.getCoordinates();
-        for (int i = 0; i <= SIZE; i++) {
-            vertices.add(p1 = p.getCoordinates().moveCoordsBydXdY(-i, -i));
+        for (int i = p1.getY(); i >= p2.getY(); i--) {
+            vertices.add(new Point(p1.getX(), i, Point.Type.OUTER));
         }
-//        p1 = p;
-
-        p = center.getCoordinates();
-        for (int i = 0; i <= SIZE; i++) {
-            vertices.add(p2 = p.getCoordinates().moveCoordsBydXdY(-i, i));
+//
+        for (int i = p2.getX(); i <= p3.getX(); i++) {
+            vertices.add(new Point(i, p2.getY(), Point.Type.OUTER));
         }
-//        p2 = p;
 
-        p = center.getCoordinates();
-        for (int i = 0; i <= SIZE; i++) {
-            vertices.add(p.getCoordinates().moveCoordsBydXdY(i, -i));
+        for (int i = 0; i <= SIZE * 2; i++) {
+            vertices.add(p3.getCoordinates().setType(Point.Type.OUTER).moveCoordsBydXdY(-i, i));
         }
+
 
         Point maxXPoint;
-        for (int y = p1.getY(); y <= p2.getY(); y++) {
-            final int finalY = y;
+        for (int y = p1.getY(); y >= p2.getY(); y--) {
+            final int currentY = y;
             maxXPoint = vertices.stream()
                     .distinct()
-                    .filter(point -> point.getY() == finalY)
+                    .filter(point -> point.getY() == currentY)
                     .max(Comparator.comparing(Point::getX))
                     .get();
 
-            p = p1.getCoordinates();
-            for (int x = p.getX(); x < maxXPoint.getX(); x++) {
-                vertices.add(new Point(x, y));
+            for (int x = p1.getX(); x < maxXPoint.getX(); x++) {
+                Point p = new Point(x, y, Point.Type.INNER);
+                if (!vertices.contains(p)) {
+                    vertices.add(p);
+                }
             }
         }
 
@@ -101,6 +112,10 @@ public class Shape {
 
     public List<Point> getShapeVertices() {
         return vertices;
+    }
+
+    public List<Point> getPoints(Point.Type type) {
+        return vertices.stream().filter(point -> point.getType() == type).collect(Collectors.toList());
     }
 
     public Point getCenter() {
@@ -146,10 +161,8 @@ public class Shape {
                 '}';
     }
 
-    enum Type {
+    public enum Type {
         TRIANGLE,
         L_SHAPE
     }
-
-
 }

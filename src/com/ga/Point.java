@@ -1,10 +1,18 @@
 package com.ga;
 
 public class Point {
+
+
     private int x = 0;
     private int y = 0;
-
+    private Type type = Type.WHATEVER;
     public Point() {
+    }
+
+    public Point(Point p, Type type) {
+        x = p.x;
+        y = p.y;
+        this.type = type;
     }
 
     public Point(Point p) {
@@ -17,6 +25,12 @@ public class Point {
         this.x = x;
     }
 
+    public Point(int x, int y, Type type) {
+        this.y = y;
+        this.x = x;
+        this.type = type;
+    }
+
     public Point moveCoordsBydXdY(int x, int y) {
         this.x += x;
         this.y += y;
@@ -25,7 +39,16 @@ public class Point {
     }
 
     Point getCoordinates() {
-        return new Point(this);
+        return new Point(this, type);
+    }
+
+    public Type getType() {
+        return this.type;
+    }
+
+    public Point setType(Type type) {
+        this.type = type;
+        return this;
     }
 
     public int getX() {
@@ -49,6 +72,7 @@ public class Point {
         return "Point{" +
                 "x=" + x +
                 ", y=" + y +
+                ", type=" + type +
                 '}';
     }
 
@@ -66,5 +90,11 @@ public class Point {
 
         Point tmp = (Point) obj;
         return tmp.getX() == this.getX() && tmp.getY() == this.getY();
+    }
+
+    enum Type {
+        INNER,
+        OUTER,
+        WHATEVER
     }
 }
