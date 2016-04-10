@@ -1,5 +1,8 @@
 package com.ga;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Field {
 
     private static final String ANSI_RESET = "\u001B[0m";
@@ -13,6 +16,7 @@ public class Field {
     private static final String ANSI_WHITE = "\u001B[37m";
 
     public Shape[][] field;
+    public List<Shape> shapes = new ArrayList<>();
     private int fieldSize;
 
     public Field(int size) {
@@ -25,18 +29,13 @@ public class Field {
     }
 
     public void placeShape(Shape shape) {
-        shape.getShapeVertices().forEach(point -> field[point.getX()][point.getY()] = shape);
+        if (fitShape(shape)) {
+            shape.getShapeVertices().forEach(point -> field[point.getX()][point.getY()] = shape);
+            shapes.add(shape);
+        }
     }
 
     public boolean fitShape(Shape shape) {
-//        try {
-//            if (getShapeByPoint(point).getShapeVertices().stream().filter(shapePoint -> shapePoint.equals(point)).findFirst().get() != null) {
-//                return false;
-//            }
-//        } catch (Exception ignored) {
-//        }
-//        List<Point> innerPoints = getShapeByPoint(point).getPoints(Point.Type.INNER);
-//        return !innerPoints.stream().anyMatch(innerPoint -> shape.getShapeVertices().contains(innerPoint));
 
         return shape.getShapeVertices().stream().noneMatch(p -> getShapeByPoint(p) != null);
     }
@@ -60,18 +59,17 @@ public class Field {
     public String toString() {
         StringBuilder s = new StringBuilder();
 
-        for (int i = fieldSize; i >= 0; i--) {
-            for (int j = 0; j <= fieldSize; j++) {
-
-                Point p = new Point(j, i);
-                if (field[j][i] != null) {
+        for (int y = fieldSize; y >= 0; y--) {
+            for (int x = 0; x < this.getSize(); x++) {
+                Point p = new Point(x, y);
+                if (field[x][y] != null) {
                     final Point finalP = p;
-                    p = field[j][i].getShapeVertices()
+                    p = field[x][y].getShapeVertices()
                             .stream()
                             .filter(point -> point.getX() == finalP.getX() && point.getY() == finalP.getY())
                             .findFirst()
                             .get();
-                    if (p.equals(field[j][i].getCenter())) {
+                    if (p.equals(field[x][y].getCenter())) {
                         s.append(ANSI_YELLOW + "\u23FA" + ANSI_RESET);
                     } else if (p.getType() == Point.Type.INNER) {
                         s.append(ANSI_GREEN + "\u23FA" + ANSI_RESET);
@@ -84,7 +82,6 @@ public class Field {
             }
             s.append("\n");
         }
-
         return s.toString();
     }
 

@@ -8,5 +8,7 @@ public class Species {
         this.field = field;
     }
 
-
+    public void setFitness(double fitnessValue) {
+        this.fitnessValue = fitnessValue;
+    }
 }

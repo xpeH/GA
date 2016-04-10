@@ -1,89 +1,71 @@
 package com.ga.impl;
 
 import com.ga.*;
-import com.ga.Point;
-import com.ga.Shape;
-import de.erichseifert.gral.data.DataTable;
-import de.erichseifert.gral.plots.XYPlot;
-import de.erichseifert.gral.ui.InteractivePanel;
 
-import javax.swing.*;
-import java.awt.*;
 import java.util.Random;
 
-public class GA extends JFrame {
+public class GA extends ExamplePanel {
     final static int FIELD_SIZE = 20;
     final static int POPULATION_SIZE = 5;
-    final static int SHAPES_AMOUNT = 9;
+    final static int SHAPES_AMOUNT = 50;
 
-    Population population;
-    double fitness;
-    Field field;
+    public Population population = new Population();
+    public Field field = new Field(FIELD_SIZE);
 
-    public GA() throws HeadlessException {
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(800, 600);
+    public static void main(String[] args) {
+        GA ga = new GA();
+        ga.generatePopulation().calcFitness();
+
+
+        System.out.println(ga.generateSpecies().field.toString());
+//        ga.field.placeShape(new Shape(new Point(5, 5), 90, Type.TRIANGLE));
+        System.out.println(ga.field);
+        System.out.println(ga.field.getFreeRows());
+
+        ga.showInFrame(ga.field.shapes);
     }
 
-    void generatePopulation() {
+    GA generatePopulation() {
         for (int i = 0; i <= POPULATION_SIZE; i++) {
             population.addSpecies(generateSpecies());
         }
-
+        return this;
     }
 
-    public Species generateSpecies() {
-        Field f = new Field(FIELD_SIZE);
+    private Species generateSpecies() {
         for (int i = 0; i < SHAPES_AMOUNT; i++) {
-            boolean exception = true;
-            while (exception) {
-                try {
-                    Shape s = generateChromosome();
-                    if (f.fitShape(s)) {
-                        f.placeShape(s);
-                        exception = false;
-                    } else {
-                        exception = true;
-                    }
-                } catch (Exception ignored) {
-                    exception = true;
-                }
+            try {
+                Shape s = generateGene();
+                field.placeShape(s);
+            } catch (Exception ignored) {
             }
         }
-        plot(f);
-
-        return new Species(f);
+        return new Species(field);
     }
 
-    private void plot(Field f) {
-        field = f;
-        DataTable data = new DataTable(Double.class, Double.class);
-
-        for (int i = 0; i < f.getSize(); i++) {
-            for (int j = 0; j < f.getSize(); j++) {
-                Point p = new Point(j, i);
-                Shape s = f.getShapeByPoint(p);
-                if (s != null) {
-                    data.add((double) j, (double) i);
-                }
-            }
-        }
-
-        XYPlot plot = new XYPlot(data);
-        getContentPane().add(new InteractivePanel(plot));
-//        LineRenderer lines = new DefaultLineRenderer2D();
-//        plot.getPointRenderers(data);
-    }
-
-    public Shape generateChromosome() {
+    public Shape generateGene() {
         Random r = new Random();
         Random r1 = new Random();
         Random r2 = new Random();
+
         Point p = new Point(r.nextInt(FIELD_SIZE - 1) + 1, r1.nextInt(FIELD_SIZE - 1) + 1);
         return new Shape(p, r2.nextInt(4) * 90, Shape.Type.TRIANGLE);
     }
 
-    public void calcFitness(Species spec) {
+    public GA calcFitness() {
+        population.stream().forEach(species -> {
+            population.fitness += (double) species.field.shapes.size();
+            species.setFitness(species.field.shapes.size());
+        });
+        return this;
+    }
 
+    public GA selection() {
+        double selProb = new Random().nextDouble();
+        population.stream().forEach(species -> {
+
+                }
+        );
+        return this;
     }
 }

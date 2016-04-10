@@ -1,6 +1,5 @@
 package com.ga;
 
-import com.ga.impl.GA;
 import org.ejml.simple.SimpleMatrix;
 
 import java.util.ArrayList;
@@ -35,29 +34,6 @@ public class Shape {
         vertices.forEach(point -> calcPointRotation(point, angle));
     }
 
-    public static void main(String[] args) {
-
-
-        GA f = new GA();
-//        f.generateSpecies();
-        System.out.println(f.generateSpecies().field.toString());
-        System.out.println(f.generateSpecies().field.getFreeRows());
-        f.setVisible(true);
-
-//        System.out.println(f.shapes.size());
-//        System.out.println(f.shapes);
-
-//        Field f = new Field(20);
-//
-//        f.placeShape(new Shape(new Point(5, 5), 0, Type.TRIANGLE));
-//        f.placeShape(new Shape(new Point(9, 5), 0, Type.TRIANGLE));
-//        f.placeShape(new Shape(new Point(9, 15), 0, Type.TRIANGLE));
-//        f.placeShape(new Shape(new Point(9, 10), 0, Type.TRIANGLE));
-//        f.placeShape(new Shape(new Point(9, 2), 0, Type.TRIANGLE));
-//
-//        System.out.println(f.toString());
-//        System.out.println(f.getFreeRows());
-    }
 
     private void newLShape(Point center) {
 
