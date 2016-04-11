@@ -2,12 +2,17 @@ package com.ga.impl;
 
 import com.ga.*;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 public class GA extends ExamplePanel {
     final static int FIELD_SIZE = 20;
     final static int POPULATION_SIZE = 5;
     final static int SHAPES_AMOUNT = 50;
+    final static double CROSSOVER_PROB = 0.3;
 
     public Population population = new Population();
     public Field field = new Field(FIELD_SIZE);
@@ -57,6 +62,7 @@ public class GA extends ExamplePanel {
             population.fitness += (double) species.field.shapes.size();
             species.setFitness(species.field.shapes.size());
         });
+        population.sort();
         return this;
     }
 
@@ -67,5 +73,21 @@ public class GA extends ExamplePanel {
                 }
         );
         return this;
+    }
+
+    public GA crossOver() {
+        List<Species> crossOverCandidates = population.stream().filter(species -> species.getFitnessValue() < CROSSOVER_PROB).collect(Collectors.toList());
+        List<Species> newPopulation = new ArrayList<>();
+        for (Iterator<Species> iterator = crossOverCandidates.iterator(); iterator.hasNext(); ) {
+            Species parent1 = iterator.next();
+            Species parent2 = iterator.next();
+
+            getChild(parent1, parent2);
+        }
+        return this;
+    }
+
+    private void getChild(Species parent1, Species parent2) {
+
     }
 }

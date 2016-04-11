@@ -11,4 +11,8 @@ public class Species {
     public void setFitness(double fitnessValue) {
         this.fitnessValue = fitnessValue;
     }
+
+    public double getFitnessValue() {
+        return fitnessValue;
+    }
 }

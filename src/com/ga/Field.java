@@ -2,26 +2,32 @@ package com.ga;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 public class Field {
-
-    private static final String ANSI_RESET = "\u001B[0m";
-    private static final String ANSI_BLACK = "\u001B[30m";
-    private static final String ANSI_RED = "\u001B[31m";
-    private static final String ANSI_GREEN = "\u001B[32m";
-    private static final String ANSI_YELLOW = "\u001B[33m";
-    private static final String ANSI_BLUE = "\u001B[34m";
-    private static final String ANSI_PURPLE = "\u001B[35m";
-    private static final String ANSI_CYAN = "\u001B[36m";
-    private static final String ANSI_WHITE = "\u001B[37m";
+    private static final int WINDOW_SIZE = 6;
 
     public Shape[][] field;
     public List<Shape> shapes = new ArrayList<>();
     private int fieldSize;
+    private Point windowPosition;
 
     public Field(int size) {
         field = new Shape[size][size];
         fieldSize = field.length - 1;
+        genWindowCoords();
+    }
+
+    public void genWindowCoords() {
+        Random r = new Random();
+        int low = WINDOW_SIZE / 2;
+        int high = WINDOW_SIZE - low + 1; // to be inclusive in random
+        windowPosition = new Point(r.nextInt(high - low) + low, r.nextInt(high - low) + low);
+    }
+
+    private boolean windowsNotCross(Point otherWindowCoordinates) {
+        return (Math.abs(windowPosition.getX() - otherWindowCoordinates.getX()) >= WINDOW_SIZE) && (Math.abs(windowPosition.getY() - otherWindowCoordinates.getY()) >= WINDOW_SIZE);
     }
 
     public int getSize() {
@@ -33,6 +39,11 @@ public class Field {
             shape.getShapeVertices().forEach(point -> field[point.getX()][point.getY()] = shape);
             shapes.add(shape);
         }
+    }
+
+    public void removeShape(Shape shape) {
+        shape.getShapeVertices().forEach(point -> field[point.getX()][point.getY()] = null);
+        shapes = shapes.stream().filter(shape::equals).collect(Collectors.toList());
     }
 
     public boolean fitShape(Shape shape) {
@@ -57,6 +68,16 @@ public class Field {
 
     @Override
     public String toString() {
+        final String ANSI_RESET = "\u001B[0m";
+        final String ANSI_BLACK = "\u001B[30m";
+        final String ANSI_RED = "\u001B[31m";
+        final String ANSI_GREEN = "\u001B[32m";
+        final String ANSI_YELLOW = "\u001B[33m";
+        final String ANSI_BLUE = "\u001B[34m";
+        final String ANSI_PURPLE = "\u001B[35m";
+        final String ANSI_CYAN = "\u001B[36m";
+        final String ANSI_WHITE = "\u001B[37m";
+
         StringBuilder s = new StringBuilder();
 
         for (int y = fieldSize; y >= 0; y--) {
@@ -101,5 +122,36 @@ public class Field {
                 freeRows++;
         }
         return freeRows;
+    }
+
+    public Point getWindowPosition() {
+        return windowPosition;
+    }
+
+    public void switchWithShapes(Field otherField) {
+        while (windowsNotCross(otherField.getWindowPosition())) {
+            genWindowCoords();
+            otherField.genWindowCoords();
+        }
+//TODO to be continued...
+
+//        List<Shape> otherWinShapes = getShapesInWindow(otherField).stream().filter(shape -> {
+//            shape.getShapeVertices().stream().anyMatch(point -> )
+//        });
+
+        List<Shape> thisWinshapes = getShapesInWindow(this);
+
+
+    }
+
+    private List<Shape> getShapesInWindow(Field f) {
+        Point win = f.getWindowPosition();
+        List<Shape> shapes = new ArrayList<>();
+        for (int y = win.getY() - WINDOW_SIZE / 2; y < win.getY() + WINDOW_SIZE / 2; y++) {
+            for (int x = win.getX() - WINDOW_SIZE / 2; x < win.getX() + WINDOW_SIZE / 2; x++) {
+                shapes.add(f.getShapeByPoint(new Point(x, y)));
+            }
+        }
+        return shapes.stream().distinct().collect(Collectors.toList());
     }
 }

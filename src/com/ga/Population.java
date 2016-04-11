@@ -9,6 +9,13 @@ public class Population implements Iterable {
     public double fitness;
     List<Species> population = new ArrayList<>();
 
+    public Population(List<Species> population) {
+        this.population = population;
+    }
+
+    public Population() {
+    }
+
     public void addSpecies(Species s) {
         population.add(s);
     }
@@ -26,4 +33,7 @@ public class Population implements Iterable {
         return population.stream();
     }
 
+    public void sort() {
+        population.stream().sorted((left, right) -> new Double(left.getFitnessValue()).compareTo(new Double(left.getFitnessValue())));
+    }
 }

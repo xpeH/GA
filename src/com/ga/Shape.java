@@ -137,6 +137,21 @@ public class Shape {
                 '}';
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;  // type check
+
+        if (obj == null)
+            return false;
+
+        if (!(getClass() == obj.getClass()))
+            return false;
+
+        Shape tmp = (Shape) obj;
+        return tmp.getCenter() == this.getCenter() && tmp.angle == this.angle && tmp.getShapeVertices() == this.getShapeVertices();
+    }
+
     public enum Type {
         TRIANGLE,
         L_SHAPE
