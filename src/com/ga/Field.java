@@ -6,17 +6,22 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 public class Field {
-    private static final int WINDOW_SIZE = 6;
+    private static final int WINDOW_SIZE = 5;
 
     public Shape[][] field;
     public List<Shape> shapes = new ArrayList<>();
     private int fieldSize;
     private Point windowPosition;
+    private int removedShapesAmount = 0;
 
     public Field(int size) {
         field = new Shape[size][size];
         fieldSize = field.length - 1;
         genWindowCoords();
+    }
+
+    public void resetRemovedShapesAmount() {
+        removedShapesAmount = 0;
     }
 
     public void genWindowCoords() {
@@ -41,9 +46,11 @@ public class Field {
         }
     }
 
-    public void removeShape(Shape shape) {
+    public void removeShape(Shape shape, boolean increment) {
         shape.getShapeVertices().forEach(point -> field[point.getX()][point.getY()] = null);
         shapes = shapes.stream().filter(shape::equals).collect(Collectors.toList());
+        if (increment)
+            removedShapesAmount++;
     }
 
     public boolean fitShape(Shape shape) {
@@ -133,23 +140,54 @@ public class Field {
             genWindowCoords();
             otherField.genWindowCoords();
         }
-//TODO to be continued...
+        List<Shape> otherWinFullShapes = otherField.getShapesInWindow().stream().filter(shape ->
+                shape.getShapeVertices().stream().allMatch(
+                        point ->
+                        {
+                            boolean inWin = Math.abs(otherField.getWindowPosition().getX() - point.getX()) <= (WINDOW_SIZE / 2)
+                                    &&
+                                    Math.abs(otherField.getWindowPosition().getY() - point.getY()) <= (WINDOW_SIZE / 2);
+                            if (!inWin) {
+                                otherField.removeShape(shape, true);
+                            }
+                            return inWin;
+                        }
+                )
+        ).collect(Collectors.toList());
 
-//        List<Shape> otherWinShapes = getShapesInWindow(otherField).stream().filter(shape -> {
-//            shape.getShapeVertices().stream().anyMatch(point -> )
-//        });
+        List<Shape> winFullShapes = this.getShapesInWindow().stream().filter(shape ->
+                shape.getShapeVertices().stream().allMatch(
+                        point ->
+                        {
+                            boolean inWin = (Math.abs(this.getWindowPosition().getX() - point.getX()) > (WINDOW_SIZE / 2)
+                                    &&
+                                    Math.abs(this.getWindowPosition().getY() - point.getY()) > WINDOW_SIZE / 2);
+                            if (!inWin) {
+                                this.removeShape(shape, true);
+                            }
+                            return inWin;
+                        }
+                )
+        ).collect(Collectors.toList());
 
-        List<Shape> thisWinshapes = getShapesInWindow(this);
-
-
+        winFullShapes.stream().forEach(shape -> {
+                    this.removeShape(shape, false);
+                    otherField.placeShape(shape);
+                }
+        );
+        otherWinFullShapes.stream().forEach(shape -> {
+                    otherField.removeShape(shape, false);
+                    this.placeShape(shape);
+                }
+        );
     }
 
-    private List<Shape> getShapesInWindow(Field f) {
-        Point win = f.getWindowPosition();
+    public List<Shape> getShapesInWindow() {
+        Point win = this.getWindowPosition();
         List<Shape> shapes = new ArrayList<>();
         for (int y = win.getY() - WINDOW_SIZE / 2; y < win.getY() + WINDOW_SIZE / 2; y++) {
             for (int x = win.getX() - WINDOW_SIZE / 2; x < win.getX() + WINDOW_SIZE / 2; x++) {
-                shapes.add(f.getShapeByPoint(new Point(x, y)));
+                shapes.add(this.getShapeByPoint(new Point(x, y)));
             }
         }
         return shapes.stream().distinct().collect(Collectors.toList());

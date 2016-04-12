@@ -36,4 +36,8 @@ public class Population implements Iterable {
     public void sort() {
         population.stream().sorted((left, right) -> new Double(left.getFitnessValue()).compareTo(new Double(left.getFitnessValue())));
     }
+
+    public Species getSpecies(int index) {
+        return population.get(index);
+    }
 }

@@ -35,10 +35,8 @@ import java.awt.geom.Ellipse2D;
 import java.util.List;
 import java.util.Random;
 
-/**
- * Abstract base class for all visual examples.
- */
-public abstract class ExamplePanel extends JPanel {
+
+public class ExamplePanel extends JPanel {
     /**
      * First corporate color used for normal coloring.
      */
@@ -62,8 +60,8 @@ public abstract class ExamplePanel extends JPanel {
         setBackground(Color.WHITE);
     }
 
-    protected JFrame showInFrame(List<Shape> shapes) {
-        JFrame frame = new JFrame(getTitle());
+    public JFrame showInFrame(List<Shape> shapes) {
+        JFrame frame = new JFrame();
         frame.getContentPane().add(this, BorderLayout.CENTER);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(getPreferredSize());
@@ -104,19 +102,6 @@ public abstract class ExamplePanel extends JPanel {
         float g = rand.nextFloat();
         float b = rand.nextFloat();
         return GraphicsUtils.deriveWithAlpha(new Color(r, g, b), 96);
-    }
-
-    @Override
-    public String toString() {
-        return getTitle();
-    }
-
-    public String getTitle() {
-        return "Stacked plots";
-    }
-
-    public String getDescription() {
-        return "An area and a line plot with synchronized actions.";
     }
 
 }
